@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_blog/_core/constants/http.dart';
 import 'package:flutter_blog/_core/constants/move.dart';
 import 'package:flutter_blog/data/dto/response_dto.dart';
 import 'package:flutter_blog/data/dto/user_request.dart';
@@ -20,6 +21,20 @@ class SessionUser {
     ResponseDTO responseDTO = await UserRepository().fetchJoin(joinReqDTO);
     if (responseDTO.code == 1) {
       Navigator.pushNamed(mContext!, Move.loginPage);
+    } else {
+      ScaffoldMessenger.of(mContext!)
+          .showSnackBar(SnackBar(content: Text(responseDTO.msg)));
+    }
+  }
+
+  Future<void> login(LoginReqDTO loginReqDTO) async {
+    ResponseDTO responseDTO = await UserRepository().fetchLogin(loginReqDTO);
+    if (responseDTO.code == 1) {
+      this.user = responseDTO.data as User;
+      this.jwt = responseDTO.token;
+      this.isLogin = true;
+      await secureStorage.write(key: "jwt", value: responseDTO.token);
+      Navigator.pushNamed(mContext!, Move.postListPage);
     } else {
       ScaffoldMessenger.of(mContext!)
           .showSnackBar(SnackBar(content: Text(responseDTO.msg)));

@@ -14,4 +14,19 @@ class UserRepository {
       return ResponseDTO(-1, "중복되는 유저명입니다", null);
     }
   }
+
+  Future<ResponseDTO> fetchLogin(LoginReqDTO requestDTO) async {
+    try {
+      final response = await dio.post("/login", data: requestDTO.toJson());
+      ResponseDTO responseDTO = ResponseDTO.fromJson(response.data);
+      responseDTO.data = User.fromJson(responseDTO.data);
+      final jwt = response.headers["Authorization"];
+      if (jwt != null) {
+        responseDTO.token = jwt.first;
+      }
+      return responseDTO;
+    } catch (e) {
+      return ResponseDTO(-1, "유저네임 혹은 비빌먼호가 틀렸습니다.", null);
+    }
+  }
 }

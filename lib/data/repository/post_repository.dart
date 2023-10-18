@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_blog/_core/constants/http.dart';
+import 'package:flutter_blog/data/dto/post_request.dart';
 import 'package:flutter_blog/data/model/post.dart';
+import 'package:logger/logger.dart';
 
 import '../dto/response_dto.dart';
 
@@ -15,7 +17,24 @@ class PostRepository {
       responseDTO.data = postList;
       return responseDTO;
     } catch (e) {
-      return ResponseDTO(-1, "로그인후 사용 가능합니다", null);
+      return ResponseDTO(-1, "게시글 목록 불러오기 실패", null);
+    }
+  }
+
+  Future<ResponseDTO> fetchPost(String jwt, PostSaveReqDTO dto) async {
+    try {
+      final response = await dio.post("/post",
+          data: dto.toJson(),
+          options: Options(headers: {"Authorization": "${jwt}"}));
+      Logger().d(response.data);
+      ResponseDTO responseDTO = ResponseDTO.fromJson(response.data);
+      Logger().d(responseDTO.data);
+      Post post = Post.fromJson(responseDTO.data);
+      responseDTO.data = post;
+
+      return responseDTO;
+    } catch (e) {
+      return ResponseDTO(-1, "게시글 작성 실패", null);
     }
   }
 }

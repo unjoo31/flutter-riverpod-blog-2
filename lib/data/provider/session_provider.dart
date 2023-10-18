@@ -40,6 +40,14 @@ class SessionUser {
           .showSnackBar(SnackBar(content: Text(responseDTO.msg)));
     }
   }
+
+  Future<void> logout() async {
+    this.jwt = null;
+    this.isLogin = false;
+    this.user = null;
+    await secureStorage.delete(key: "jwt");
+    Navigator.pushNamed(mContext!, Move.loginPage);
+  }
 }
 
 final sessionProvider = Provider<SessionUser>((ref) {

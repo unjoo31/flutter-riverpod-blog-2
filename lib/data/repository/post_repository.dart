@@ -21,7 +21,7 @@ class PostRepository {
     }
   }
 
-  Future<ResponseDTO> fetchPost(String jwt, PostSaveReqDTO dto) async {
+  Future<ResponseDTO> savePost(String jwt, PostSaveReqDTO dto) async {
     try {
       final response = await dio.post("/post",
           data: dto.toJson(),
@@ -35,6 +35,18 @@ class PostRepository {
       return responseDTO;
     } catch (e) {
       return ResponseDTO(-1, "게시글 작성 실패", null);
+    }
+  }
+
+  Future<ResponseDTO> fetchPost(String jwt, int id) async {
+    try {
+      Response response = await dio.get("/post/${id}",
+          options: Options(headers: {"Authorization": "$jwt"}));
+      ResponseDTO responseDTO = ResponseDTO.fromJson(response.data);
+      responseDTO.data = Post.fromJson(responseDTO.data);
+      return responseDTO;
+    } catch (e) {
+      return ResponseDTO(-1, "게시글 한건 불러오기 실패", null);
     }
   }
 }

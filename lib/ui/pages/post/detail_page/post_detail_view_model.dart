@@ -1,0 +1,31 @@
+import 'package:flutter_blog/data/dto/response_dto.dart';
+import 'package:flutter_blog/data/model/post.dart';
+import 'package:flutter_blog/data/repository/post_repository.dart';
+import 'package:flutter_blog/data/store/param_store.dart';
+import 'package:flutter_blog/data/store/session_store.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+class PostDetailModel {
+  Post post;
+
+  PostDetailModel(this.post);
+}
+
+class PostDetailViewModel extends StateNotifier<PostDetailModel?> {
+  PostDetailViewModel(super._state, this.ref);
+  Ref ref;
+
+  Future<void> notifyInit(int id) async {
+    SessionUser sessionUser = ref.read(sessionProvider);
+    ResponseDTO responseDTO =
+        await PostRepository().fetchPost(sessionUser.jwt!, id);
+    state = PostDetailModel(responseDTO.data);
+  }
+}
+
+final postDetailProvider =
+    StateNotifierProvider.autoDispose<PostDetailViewModel, PostDetailModel?>(
+        (ref) {
+  int postId = ref.read(paramProvider).postDetailId!;
+  return PostDetailViewModel(null, ref)..notifyInit(postId);
+});
